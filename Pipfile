@@ -28,6 +28,7 @@ MarkupSafe = "==2.0.1"
 psycopg-binary = "*"
 gunicorn = "*"
 whitenoise = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
