@@ -22,6 +22,7 @@ User = get_user_model()
     }
 ))
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def user_login(request):
     
     """Allows users to log in to the platform. Sends the jwt refresh and access tokens. Check settings for token life time."""
