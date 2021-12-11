@@ -16,7 +16,7 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv()
 
-env = os.getenv('ENVIRONMENT', 'development')
+# env = os.getenv('ENVIRONMENT', 'development')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +33,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET', 'development')
 DEBUG = True
 
 ALLOWED_HOSTS = ['ej-elearning-api.herokuapp.com']
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -88,25 +89,32 @@ WSGI_APPLICATION = 'elearning_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-if env == 'development':
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST1'),
-            'PORT': os.getenv('DB_PORT'),
-            }
-        }
+}
+
+# if env == 'development':
+
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': os.getenv('DB_NAME'),
+#             'USER': os.getenv('DB_USER'),
+#             'PASSWORD': os.getenv('DB_PASSWORD'),
+#             'HOST': os.getenv('DB_HOST'),
+#             'PORT': os.getenv('DB_PORT'),
+#             }
+#         }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
