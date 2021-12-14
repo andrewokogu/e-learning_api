@@ -168,7 +168,7 @@ def get_student(request, student_id):
 
 
 # @swagger_auto_schema(methods=['POST'], request_body=CourseSerializer())
-# User = get_user_model()
+User = get_user_model()
 # @authentication_classes([BasicAuthentication])
 
 @api_view(['GET'])
@@ -307,12 +307,23 @@ def create_course(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #get course by  user id (course read)
-User = get_user_model()
+# User = get_user_model()
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
 # @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_course_by_id(request, course_id):
+
+    try:
+        course = Course.objects.get(id=course_id)
+    except Course.DoesNotExist:
+        data={
+            'error':"course not found"
+            }
+        return Response(data, status=status.HTTP_404_NOT_FOUND)
+    if course.user != request.user:#new new
+        # raise PermissionDenied(detail='you do not have permission to perform this action')
+        raise PermissionDenied(detail='you only have permission to view your own module') 
     
     if request.method == 'GET':
         # course = Course.objects.all()
@@ -419,7 +430,7 @@ def create_module(request):
 #get course by  user id (course read)
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_module_by_id(request, module_id):
     try:
@@ -432,10 +443,10 @@ def get_module_by_id(request, module_id):
     if module.user != request.user:#new new
         # raise PermissionDenied(detail='you do not have permission to perform this action')
         raise PermissionDenied(detail='you only have permission to view your own module') 
-    
     if request.method == 'GET':
-        # course = Course.objects.all()
+        # module = Module.objects.all()
         module = Module.objects.filter(user=request.user)
         serializer = ModuleSerializer(module, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)                
+    
