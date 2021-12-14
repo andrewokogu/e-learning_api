@@ -13,23 +13,17 @@ from .serializers import *
 from .models import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 # from drf_yasg import openapi
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#             'rest_framework.authentication.TokenAuthentication',
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#             'rest_framework.permissions.IsAuthenticated',
 
-#     ),}
+User = get_user_model()
 
 @swagger_auto_schema(methods=['POST'], request_body=StudentSerializer())
+@api_view(['POST'])
 # @permission_classes([IsAdminUser])
 # @authentication_classes([BasicAuthentication])
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def students(request):
     if request.method == 'GET':
@@ -60,6 +54,7 @@ def students(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_student_list(request):
+
     if request.method == 'GET':
         student = Student.objects.all()
         # student = Student.objects.filter(user=request.user)
@@ -68,12 +63,22 @@ def get_student_list(request):
         return Response(serializer.data, status=status.HTTP_200_OK)            
 
 # A student can only view their record
-User = get_user_model()
+
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_s(request, student_id):
+    try:
+        student = Student.objects.get(id=student_id)
+    except Student.DoesNotExist:
+        data={
+            'error':"Student not found"
+            }
+        return Response(data, status=status.HTTP_404_NOT_FOUND)
+    if student.user != request.user:#new new
+        # raise PermissionDenied(detail='you do not have permission to perform this action')
+        raise PermissionDenied(detail='you only have permission to view your details') 
     
     if request.method == 'GET':
         # course = Course.objects.all()
@@ -82,7 +87,9 @@ def get_s(request, student_id):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-#only the admin have the priviledge to PUT and DELETE
+
+
+#only the admin have the priviledge to PUT, DELETE and view student list
 @swagger_auto_schema(methods=['PUT','DELETE'], request_body=StudentSerializer())
 @api_view(['PUT', 'DELETE'])
 # @authentication_classes([BasicAuthentication])
@@ -163,10 +170,12 @@ def get_student(request, student_id):
 # @swagger_auto_schema(methods=['POST'], request_body=CourseSerializer())
 # User = get_user_model()
 # @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAdminUser])
+
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @permission_classes([TokenAuthentication])
+# @permission_classes([IsAdminUser])
+# @permission_classes([AllowAny])
 def courses(request):
 
     if request.method == 'GET':
@@ -301,7 +310,7 @@ def create_course(request):
 User = get_user_model()
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_course_by_id(request, course_id):
     
@@ -318,8 +327,8 @@ def get_course_by_id(request, course_id):
 # @authentication_classes([BasicAuthentication])
 # @permission_classes([IsAdminUser])
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-@permission_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
 def modules(request):
     if request.method == 'GET':
         module = Module.objects.all()
@@ -408,12 +417,21 @@ def create_module(request):
 
 
 #get course by  user id (course read)
-User = get_user_model()
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_module_by_id(request, module_id):
+    try:
+        module = Module.objects.get(id=module_id)
+    except Module.DoesNotExist:
+        data={
+            'error':"Module not found"
+            }
+        return Response(data, status=status.HTTP_404_NOT_FOUND)
+    if module.user != request.user:#new new
+        # raise PermissionDenied(detail='you do not have permission to perform this action')
+        raise PermissionDenied(detail='you only have permission to view your own module') 
     
     if request.method == 'GET':
         # course = Course.objects.all()

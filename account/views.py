@@ -141,8 +141,12 @@ def add_user(request):
 
 
 @api_view(['GET'])
-@authentication_classes([BasicAuthentication])
-@permission_classes([IsAdminUser])
+# @authentication_classes([BasicAuthentication])
+# @authentication_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
+# @permission_classes([IsAdminUser])
+# @permission_classes([TokenAuthentication])
+@authentication_classes([TokenAuthentication])
 def get_user(request):
     
     """Allows the admin to see all users (both admin and normal users) """
@@ -212,8 +216,9 @@ def get_user(request):
 
 @swagger_auto_schema(methods=['PUT', 'DELETE'], request_body=UserSerializer())
 @api_view(['GET', 'PUT', 'DELETE'])
-@authentication_classes([BasicAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([BasicAuthentication])
+# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
 def profile(request):
     """Allows the logged in user to view their profile, edit or deactivate account. Do not use this view for changing password or resetting password"""
     
@@ -299,8 +304,9 @@ def profile(request):
 
 @swagger_auto_schema(methods=['POST'], request_body=ChangePasswordSerializer())
 @api_view(['POST'])
-@authentication_classes([BasicAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([BasicAuthentication])
+# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
 def change_password(request):
     user = request.user
     # print(user.password)
@@ -337,7 +343,8 @@ def change_password(request):
 
 @swagger_auto_schema(methods=['DELETE'], request_body=UserSerializer())
 @api_view(['GET', 'DELETE'])
-@authentication_classes([BasicAuthentication])
+# @authentication_classes([BasicAuthentication])
+@authentication_classes([TokenAuthentication])
 @permission_classes([IsAdminUser])
 def user_detail(request, user_id):
     """"""
