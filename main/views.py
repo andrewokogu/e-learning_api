@@ -1,7 +1,9 @@
 # from django.shortcuts import render
 
 # Create your views here.
+from django.db.models.base import Model
 from django.shortcuts import render
+from .models import Student
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -173,7 +175,7 @@ User = get_user_model()
 
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-@permission_classes([TokenAuthentication])
+@authentication_classes([TokenAuthentication])
 # @permission_classes([IsAdminUser])
 # @permission_classes([AllowAny])
 def courses(request):
@@ -312,7 +314,7 @@ def create_course(request):
 # @permission_classes([IsAdminUser])
 # @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
-def get_course_by_id(request, course_id):
+def get_course_by_id(request, course_id, student_id):
 
     try:
         course = Course.objects.get(id=course_id)
@@ -321,9 +323,9 @@ def get_course_by_id(request, course_id):
             'error':"course not found"
             }
         return Response(data, status=status.HTTP_404_NOT_FOUND)
+    # if course.user != request.user:#new new
     if course.user != request.user:#new new
-        # raise PermissionDenied(detail='you do not have permission to perform this action')
-        raise PermissionDenied(detail='you only have permission to view your own course') 
+        raise PermissionDenied(detail='you do not have permission to perform this action')
     
     if request.method == 'GET':
         # course = Course.objects.all()
