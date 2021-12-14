@@ -18,14 +18,15 @@ from rest_framework.authentication import BasicAuthentication, TokenAuthenticati
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 # from drf_yasg import openapi
 
+# @permission_classes([IsAuthenticated])
+# @permission_classes([TokenAuthentication])
+# @authentication_classes([BasicAuthentication])
+# @permission_classes([IsAdminUser])
 
 User = get_user_model()
 
 @swagger_auto_schema(methods=['POST'], request_body=StudentSerializer())
 @api_view(['POST'])
-# @permission_classes([IsAdminUser])
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def students(request):
     if request.method == 'GET':
@@ -46,8 +47,6 @@ def students(request):
             object = Student.objects.create(**serializer.validated_data, user=request.user)
             serializer = StudentSerializer(object)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-            # return Response(serializer.data, status=status.HTTP_201_CREATED) #return response
 
         else: #if data is not valid
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -67,8 +66,6 @@ def get_student_list(request):
 # A student can only view their record
 
 @api_view(['GET'])
-# @permission_classes([IsAdminUser])
-# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_s(request, student_id):
     try:
@@ -94,9 +91,6 @@ def get_s(request, student_id):
 #only the admin have the priviledge to PUT, DELETE and view student list
 @swagger_auto_schema(methods=['PUT','DELETE'], request_body=StudentSerializer())
 @api_view(['PUT', 'DELETE'])
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
 @permission_classes([IsAdminUser])
 def get_student(request, student_id):
     try:
@@ -118,7 +112,7 @@ def get_student(request, student_id):
 
         return Response(data, status=status.HTTP_200_OK)
 
-        # return Response(serializer.data, status=status.HTTP_200_OK)
+        
     #new testing code
     # elif request.method == 'POST':
     #     serializer = CourseSerializer(data = request.data) #get the posted data
@@ -140,22 +134,20 @@ def get_student(request, student_id):
 
         if serializer.is_valid():
 
-            serializer.save()#new
+            serializer.save()
             data = {
                 'status'  : True,
                 'message' : "Successful",
-                'data' : serializer.data,#new
+                'data' : serializer.data,
             }
             return Response(data, status=status.HTTP_201_CREATED)
 
-            # return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         else:
-            data = {#new
+            data = {
                 'status'  : False,
                 'message' : "Unsuccessful",
                 'error' : serializer.errors,
-            }#new
+            }
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
             # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -171,18 +163,13 @@ def get_student(request, student_id):
 
 # @swagger_auto_schema(methods=['POST'], request_body=CourseSerializer())
 User = get_user_model()
-# @authentication_classes([BasicAuthentication])
-
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAdminUser])
-# @permission_classes([AllowAny])
 def courses(request):
 
     if request.method == 'GET':
         course = Course.objects.all()
-        # course = Course.objects.filter(user=request.IsAdminUser)
+        # course = Course.objects.filter(user=request.user)
         serializer = CourseSerializer(course, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -206,9 +193,6 @@ def courses(request):
 
 User = get_user_model()
 @swagger_auto_schema(methods=['PUT','DELETE'], request_body=CourseSerializer())
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAdminUser])
 def get_course(request, course_id):
@@ -245,7 +229,6 @@ def get_course(request, course_id):
                 'data' : serializer.data,
             }
             return Response(data, status = status.HTTP_201_CREATED)
-
             # return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         else:
@@ -255,7 +238,6 @@ def get_course(request, course_id):
                 'error' : serializer.errors,
             }
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
-
             # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
@@ -314,33 +296,30 @@ def create_course(request):
 # @permission_classes([IsAdminUser])
 # @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
-def get_course_by_id(request, course_id, student_id):
+def get_course_by_id(request, course_id):
 
     try:
         course = Course.objects.get(id=course_id)
-    except Course.DoesNotExist:
+    except Student.DoesNotExist:
         data={
             'error':"course not found"
             }
         return Response(data, status=status.HTTP_404_NOT_FOUND)
+
     # if course.user != request.user:#new new
-    if course.user != request.user:#new new
-        raise PermissionDenied(detail='you do not have permission to perform this action')
+    #     raise PermissionDenied(detail='you do not have permission to perform this action')
     
     if request.method == 'GET':
         # course = Course.objects.all()
-        course = Course.objects.filter(user=request.user)
-        serializer = CourseSerializer(course, many=True)
+        # course = Course.objects.filter(user=request.user)
+        serializer = CourseSerializer(course)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
 # @swagger_auto_schema(methods=['POST'], request_body=ModuleSerializer())
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAdminUser])
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def modules(request):
     if request.method == 'GET':
@@ -361,9 +340,6 @@ def modules(request):
 
 # Only the admin can Edit and delete a course
 @swagger_auto_schema(methods=['PUT','DELETE'], request_body=ModuleSerializer())
-# # @authentication_classes([BasicAuthentication])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAdminUser])
 def get_module(request, module_id):
@@ -390,10 +366,7 @@ def get_module(request, module_id):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
-        # if module.user != request.user:
-        #     raise PermissionDenied(detail='You do not have permission to perform this action')
-        # else:    
+    elif request.method == 'DELETE':   
         module.delete()
         data = {
                 'status'  : True,
@@ -406,9 +379,6 @@ def get_module(request, module_id):
 #create a module (only admin can create a course)
 @swagger_auto_schema(methods=['POST'], request_body=ModuleSerializer())
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# @permission_classes([TokenAuthentication])
-# @authentication_classes([BasicAuthentication])
 @permission_classes([IsAdminUser])
 def create_module(request):
     
@@ -431,8 +401,6 @@ def create_module(request):
 
 #get course by  user id (course read)
 @api_view(['GET'])
-# @permission_classes([IsAdminUser])
-# @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_module_by_id(request, module_id):
     try:
@@ -442,13 +410,12 @@ def get_module_by_id(request, module_id):
             'error':"Module not found"
             }
         return Response(data, status=status.HTTP_404_NOT_FOUND)
-    if module.user != request.user:#new new
-        # raise PermissionDenied(detail='you do not have permission to perform this action')
-        raise PermissionDenied(detail='you only have permission to view your own module') 
+    # if module.user != request.user:#new
+    #     # raise PermissionDenied(detail='you do not have permission to perform this action')
     if request.method == 'GET':
         # module = Module.objects.all()
-        module = Module.objects.filter(user=request.user)
-        serializer = ModuleSerializer(module, many=True)
+        # module = Module.objects.filter(user=request.user)
+        serializer = ModuleSerializer(module)
 
         return Response(serializer.data, status=status.HTTP_200_OK)                
     
