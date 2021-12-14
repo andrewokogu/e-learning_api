@@ -323,7 +323,7 @@ def get_course_by_id(request, course_id):
         return Response(data, status=status.HTTP_404_NOT_FOUND)
     if course.user != request.user:#new new
         # raise PermissionDenied(detail='you do not have permission to perform this action')
-        raise PermissionDenied(detail='you only have permission to view your own module') 
+        raise PermissionDenied(detail='you only have permission to view your own course') 
     
     if request.method == 'GET':
         # course = Course.objects.all()
