@@ -300,14 +300,14 @@ def get_course_by_id(request, course_id):
 
     try:
         course = Course.objects.get(id=course_id)
-    except Student.DoesNotExist:
+    except Course.DoesNotExist:
         data={
             'error':"course not found"
             }
         return Response(data, status=status.HTTP_404_NOT_FOUND)
 
     # if course.user != request.user:#new new
-    #     raise PermissionDenied(detail='you do not have permission to perform this action')
+    #     # raise PermissionDenied(detail='you do not have permission to perform this action')
     
     if request.method == 'GET':
         # course = Course.objects.all()

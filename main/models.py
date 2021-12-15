@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 # Create your models here
 class Course(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='elearning_api', null=True,blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course', null=True,blank=True)
     owner = models.ForeignKey(User, related_name='courses_created',null=True , on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=300)
@@ -21,7 +21,7 @@ class Course(models.Model):
 
 
 class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='main', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student', null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     name   = models.CharField(max_length=300)
     email  = models.EmailField(unique=True)
@@ -36,7 +36,7 @@ class Student(models.Model):
         return self.course.title               
 
 class Module(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='module', null=True, blank=True)
     course = models.ForeignKey(Course, related_name='modules', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)

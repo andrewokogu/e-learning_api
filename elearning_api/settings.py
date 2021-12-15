@@ -32,8 +32,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET', 'development')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ej-elearning-api.herokuapp.com']
-# ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['ej-elearning-api.herokuapp.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
